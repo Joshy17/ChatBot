@@ -42,7 +42,7 @@ async function sendMessageToDialogflowCX(text, sessionId) {
 }
 
 // Ruta que recibe mensajes
-app.post("/send-message", async (req, res) => {
+app.post("/api/send-message", async (req, res) => {
     const { message } = req.body;
     const sessionId = "123456";
 
