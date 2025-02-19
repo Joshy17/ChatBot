@@ -69,7 +69,7 @@ function toggleChat() {
     chatContainer.classList.toggle("hidden");
 }
 
-const BACKEND_URL = "/send-message"; // Usa ruta relativa en Vercel
+const BACKEND_URL = "/api/send-message"; // Usa ruta relativa en Vercel
 
 async function enviarMensaje() {
     const userMessage = document.getElementById("mensaje").value;
