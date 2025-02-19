@@ -4,22 +4,8 @@ const { SessionsClient } = require("@google-cloud/dialogflow-cx");
 const path = require("path");
 
 const app = express();
-
-//  Habilitar CORS correctamente (deja solo esta configuración)
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*"); // Permite cualquier origen (ajusta según sea necesario)
-    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    
-    if (req.method === "OPTIONS") {
-        return res.sendStatus(200);
-    }
-    
-    next();
-});
-
+app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname)));
 
 
 const credentials = {
@@ -37,35 +23,25 @@ const credentials = {
 };
 
 
-// 📌 Conectar directamente a Dialogflow CX
-const sessionClient = new SessionsClient({
-  credentials,
-  apiEndpoint: "us-central1-dialogflow.googleapis.com",
-});
+const sessionClient = new SessionsClient({ credentials, apiEndpoint: "us-central1-dialogflow.googleapis.com" });
 
 const projectId = "chatbot-449903";
 const location = "us-central1";
 const agentId = "4dbd125e-2f3b-4960-bb42-eedf05247e75";
 
 async function sendMessageToDialogflowCX(text, sessionId) {
-    const sessionPath = sessionClient.projectLocationAgentSessionPath(
-        projectId, location, agentId, sessionId
-    );
+    const sessionPath = sessionClient.projectLocationAgentSessionPath(projectId, location, agentId, sessionId);
 
     const request = {
         session: sessionPath,
-        queryInput: {
-            text: { text: text },
-            languageCode: "es",
-        },
+        queryInput: { text: { text: text }, languageCode: "es" }
     };
 
     const [response] = await sessionClient.detectIntent(request);
-    return response.queryResult.responseMessages
-        .map(msg => (msg.text ? msg.text.text[0] : ""))
-        .join("\n");
+    return response.queryResult.responseMessages.map(msg => (msg.text ? msg.text.text[0] : "")).join("\n");
 }
 
+// Ruta que recibe mensajes
 app.post("/send-message", async (req, res) => {
     const { message } = req.body;
     const sessionId = "123456";
@@ -79,7 +55,5 @@ app.post("/send-message", async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Servidor corriendo en el puerto ${PORT}`);
-});
+// Exporta la API en lugar de usar `app.listen()`
+module.exports = app;

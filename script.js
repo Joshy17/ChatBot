@@ -69,24 +69,24 @@ function toggleChat() {
     chatContainer.classList.toggle("hidden");
 }
 
+const BACKEND_URL = "/send-message"; // Usa ruta relativa en Vercel
+
 async function enviarMensaje() {
     const userMessage = document.getElementById("mensaje").value;
-    if (!userMessage.trim()) return; // Evita enviar mensajes vacíos
+    if (!userMessage.trim()) return;
 
-    agregarMensaje("user", userMessage); // ✅ Muestra el mensaje del usuario en el chat
-    document.getElementById("mensaje").value = ""; // Limpia el input
+    agregarMensaje("user", userMessage);
+    document.getElementById("mensaje").value = "";
 
     try {
-        const response = await fetch("https://chat-bot-efem-joshy17s-projects.vercel.app/send-message", {
+        const response = await fetch(BACKEND_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: userMessage }),
         });
 
         const data = await response.json();
-        console.log("📥 Respuesta del servidor:", data); // ✅ Verifica la respuesta en consola
-
-        agregarMensaje("bot", data.reply); // ✅ Muestra la respuesta en el chat
+        agregarMensaje("bot", data.reply);
     } catch (error) {
         console.error("❌ Error al conectar con el servidor:", error);
         agregarMensaje("bot", "Error al conectar con el servidor.");
