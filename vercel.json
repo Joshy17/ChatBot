@@ -16,12 +16,28 @@
       {
         "src": "script.js",
         "use": "@vercel/static"
+      },
+      {
+        "src": "images/*",
+        "use": "@vercel/static"
       }
     ],
     "routes": [
       {
         "src": "/api/(.*)",
         "dest": "/api/index.js"
+      },
+      {
+        "src": "/styles.css",
+        "dest": "/styles.css"
+      },
+      {
+        "src": "/script.js",
+        "dest": "/script.js"
+      },
+      {
+        "src": "/images/(.*)",
+        "dest": "/images/$1"
       },
       {
         "src": "/(.*)",
