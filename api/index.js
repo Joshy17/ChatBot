@@ -55,5 +55,17 @@ app.post("/send-message", async (req, res) => {
     }
 });
 
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
+});
+
+// Servir archivos estáticos desde la carpeta "public"
+app.use(express.static(path.join(__dirname, "..")));
+
+// Ruta para servir el archivo HTML principal
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "..", "index.html"));
+});
 // Exporta la API en lugar de usar `app.listen()`
 module.exports = app;
