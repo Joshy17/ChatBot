@@ -9,7 +9,6 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname)));
 
-// 📌 Incluir credenciales directamente en el código (NO RECOMENDADO)
 const credentials = {
   type: "service_account",
   project_id: "chatbot-449903",
