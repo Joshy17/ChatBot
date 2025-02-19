@@ -4,10 +4,23 @@ const { SessionsClient } = require("@google-cloud/dialogflow-cx");
 const path = require("path");
 
 const app = express();
-app.use(cors());
-app.use(express.json());
 
+//  Habilitar CORS correctamente (deja solo esta configuración)
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*"); // Permite cualquier origen (ajusta según sea necesario)
+    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(200);
+    }
+    
+    next();
+});
+
+app.use(express.json());
 app.use(express.static(path.join(__dirname)));
+
 
 const credentials = {
   type: "service_account",
@@ -67,6 +80,6 @@ app.post("/send-message", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
