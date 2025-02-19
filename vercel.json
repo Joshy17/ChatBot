@@ -1,12 +1,10 @@
 {
     "version": 2,
-    "functions": {
-      "api/index.js": {
-        "runtime": "@vercel/node"
-      }
-    },
+    "builds": [
+      { "src": "api/server.js", "use": "@vercel/node@20" }
+    ],
     "routes": [
       { "src": "/send-message", "dest": "/api/server.js" }
     ]
-}
+  }
   
