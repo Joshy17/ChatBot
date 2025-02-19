@@ -1,8 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-const { SessionsClient } = require("@google-cloud/dialogflow-cx"); // Librería correcta para CX
+const { SessionsClient } = require("@google-cloud/dialogflow-cx");
 const path = require("path");
-require("dotenv").config();
 
 const app = express();
 app.use(cors());
@@ -10,21 +9,30 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname)));
 
-// 🔹 Cargar credenciales desde la variable de entorno
-const credentials = JSON.parse(process.env.chatbotcredenciales);
+// 📌 Incluir credenciales directamente en el código (NO RECOMENDADO)
+const credentials = {
+  type: "service_account",
+  project_id: "chatbot-449903",
+  private_key_id: "460b0aa0becd97b6578a8b9b192499a56ef5edef",
+  private_key: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDHwTWp...",
+  client_email: "chatbotucr@chatbot-449903.iam.gserviceaccount.com",
+  client_id: "112137619942569171127",
+  auth_uri: "https://accounts.google.com/o/oauth2/auth",
+  token_uri: "https://oauth2.googleapis.com/token",
+  auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+  client_x509_cert_url: "https://www.googleapis.com/robot/v1/metadata/x509/chatbotucr%40chatbot-449903.iam.gserviceaccount.com",
+  universe_domain: "googleapis.com"
+};
 
-const projectId = "chatbot-449903"; // ID del proyecto en Google Cloud
-const location = "us-central1"; // Ubicación del agente en Dialogflow CX
-const agentId = "4dbd125e-2f3b-4960-bb42-eedf05247e75"; // ID del agente en Dialogflow CX
-
-// 📌 Inicializar cliente de Dialogflow CX con credenciales de entorno
+// 📌 Conectar directamente a Dialogflow CX
 const sessionClient = new SessionsClient({
-    credentials: {
-        client_email: credentials.client_email,
-        private_key: credentials.private_key
-    },
-    apiEndpoint: "us-central1-dialogflow.googleapis.com",
+  credentials,
+  apiEndpoint: "us-central1-dialogflow.googleapis.com",
 });
+
+const projectId = "chatbot-449903";
+const location = "us-central1";
+const agentId = "4dbd125e-2f3b-4960-bb42-eedf05247e75";
 
 async function sendMessageToDialogflowCX(text, sessionId) {
     const sessionPath = sessionClient.projectLocationAgentSessionPath(
@@ -40,25 +48,17 @@ async function sendMessageToDialogflowCX(text, sessionId) {
     };
 
     const [response] = await sessionClient.detectIntent(request);
-
-    console.log("🔍 Respuesta completa de Dialogflow CX:", JSON.stringify(response, null, 2));
-
     return response.queryResult.responseMessages
-        .map(msg => msg.text ? msg.text.text[0] : "")
+        .map(msg => (msg.text ? msg.text.text[0] : ""))
         .join("\n");
 }
 
-// 🔹 Endpoint para recibir mensajes del frontend
 app.post("/send-message", async (req, res) => {
     const { message } = req.body;
     const sessionId = "123456";
 
-    console.log(`📩 Usuario: ${message}`);
-
     try {
         const response = await sendMessageToDialogflowCX(message, sessionId);
-        console.log(`🤖 Bot: ${response}`);
-
         res.json({ reply: response });
     } catch (error) {
         console.error("❌ Error en Dialogflow CX:", error);
@@ -68,5 +68,5 @@ app.post("/send-message", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
