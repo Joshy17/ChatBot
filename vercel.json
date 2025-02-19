@@ -1,12 +1,13 @@
 {
     "version": 2,
     "functions": {
-      "api/server.js": {
-        "runtime": "@vercel/node"
+      "api/index.js": {
+        "runtime": "nodejs18.x"
       }
     },
     "routes": [
-      { "src": "/send-message", "dest": "/api/server.js" }
+      { "src": "/send-message", "dest": "/api/index.js" }
     ]
-  }
+}
+  
   
