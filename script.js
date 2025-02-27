@@ -1,3 +1,6 @@
+let inactivityTimer;
+let warningCount = 0;
+
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Página cargada correctamente");
 
@@ -97,11 +100,49 @@ function agregarMensaje(tipo, mensaje) {
     const chatBody = document.getElementById("chatBody");
     const msgElement = document.createElement("p");
 
-    msgElement.textContent = mensaje;
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+    // Reemplaza los enlaces detectados con enlaces clickeables
+    const mensajeConEnlaces = mensaje.replace(urlRegex, (url) => {
+        return `<a href="${url}" target="_blank" class="chat-link">${url}</a>`;
+    });
+
+    msgElement.innerHTML = mensajeConEnlaces; // Usar innerHTML para renderizar los enlaces
+    //msgElement.textContent = mensaje;
     msgElement.classList.add(tipo === "user" ? "user-message" : "bot-message");
 
     chatBody.appendChild(msgElement);
     chatBody.scrollTop = chatBody.scrollHeight; // Auto-scroll hacia abajo
+}
+
+//  Función para reiniciar el temporizador cuando el usuario interactúa
+function resetInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    warningCount = 0; // Reiniciar contador de advertencias
+    startInactivityTimer();
+}
+
+//  Función para iniciar el temporizador de inactividad
+function startInactivityTimer() {
+    inactivityTimer = setTimeout(() => {
+        handleInactivity();
+    }, 60000); // 1 minuto sin actividad
+}
+
+//  Función para manejar la inactividad en el frontend
+function handleInactivity() {
+    if (warningCount === 0) {
+        agregarMensaje("bot", "⚠ ¿Te puedo ayudar en algo más?");
+        warningCount++;
+        startInactivityTimer();
+    } else if (warningCount === 1) {
+        agregarMensaje("bot", "⏳ Parece que sigues inactivo. ¿Necesitas ayuda?");
+        warningCount++;
+        startInactivityTimer();
+    } else if (warningCount === 2) {
+        agregarMensaje("bot", "🔴 Sesión cerrada por inactividad. Espero haberte ayudado.");
+        closeChat(); // Cerrar el chat después de 3 advertencias
+    }
 }
 
 // 🔹 CARRUSEL AUTOMÁTICO
@@ -129,3 +170,16 @@ document.getElementById("menu-trigger").addEventListener("click", function(event
 document.querySelector(".menu-toggle").addEventListener("click", function() {
     document.querySelector("nav ul").classList.toggle("show");
 });
+
+//  Función para cerrar el chat después de la inactividad
+function closeChat() {
+    document.getElementById("chatContainer").classList.add("hidden");
+}
+
+//  Eventos para detectar actividad y reiniciar el temporizador
+document.addEventListener("mousemove", resetInactivityTimer);
+document.addEventListener("keypress", resetInactivityTimer);
+document.addEventListener("click", resetInactivityTimer);
+
+//  Iniciar el temporizador cuando se carga la página
+document.addEventListener("DOMContentLoaded", startInactivityTimer);
