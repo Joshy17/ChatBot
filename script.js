@@ -91,9 +91,10 @@ async function enviarMensaje() {
         const response = await fetch(BACKEND_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: userMessage, sessionId }), // 🔹 Enviar sessionId
+            body: JSON.stringify({ message: userMessage, sessionId }), 
         });
 
+        console.log("Esta es mi id de session: ", sessionId);
         const data = await response.json();
         agregarMensaje("bot", data.reply);
     } catch (error) {
@@ -110,17 +111,20 @@ function agregarMensaje(tipo, mensaje) {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
 
     // Reemplaza los enlaces detectados con enlaces clickeables
-    const mensajeConEnlaces = mensaje.replace(urlRegex, (url) => {
+    let mensajeConEnlaces = mensaje.replace(urlRegex, (url) => {
         return `<a href="${url}" target="_blank" class="chat-link">${url}</a>`;
     });
 
-    msgElement.innerHTML = mensajeConEnlaces; // Usar innerHTML para renderizar los enlaces
-    //msgElement.textContent = mensaje;
+    // 🔹 Reemplaza los saltos de línea por <br> para formatear correctamente
+    mensajeConEnlaces = mensajeConEnlaces.replace(/\n/g, "<br>");
+
+    msgElement.innerHTML = mensajeConEnlaces; // Usar innerHTML para renderizar el formato
     msgElement.classList.add(tipo === "user" ? "user-message" : "bot-message");
 
     chatBody.appendChild(msgElement);
     chatBody.scrollTop = chatBody.scrollHeight; // Auto-scroll hacia abajo
 }
+
 
 //  Función para reiniciar el temporizador cuando el usuario interactúa
 function resetInactivityTimer() {
