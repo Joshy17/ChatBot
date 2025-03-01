@@ -1,5 +1,6 @@
 let inactivityTimer;
 let warningCount = 0;
+let sessionClosed = false;
 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Página cargada correctamente");
@@ -81,17 +82,27 @@ if (!sessionId) {
 }
 
 async function enviarMensaje() {
+    if (sessionClosed) return; // 🔒 Evita enviar mensajes si la sesión está cerrada
+
     const userMessage = document.getElementById("mensaje").value;
     if (!userMessage.trim()) return;
 
     agregarMensaje("user", userMessage);
     document.getElementById("mensaje").value = "";
 
+    // Detectar si el usuario quiere cerrar la sesión con una despedida
+    const despedidas = ["adios", "hasta luego", "fin", "bye", "nos vemos"];
+    if (despedidas.includes(userMessage.toLowerCase().trim())) {
+        agregarMensaje("bot", "😊 Un gusto haberte ayudado. ¡Hasta luego!");
+        closeSession(); // Bloquear input y cerrar sesión
+        return;
+    }
+
     try {
         const response = await fetch(BACKEND_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: userMessage, sessionId }), 
+            body: JSON.stringify({ message: userMessage, sessionId }),
         });
 
         console.log("Esta es mi id de session: ", sessionId);
@@ -128,16 +139,18 @@ function agregarMensaje(tipo, mensaje) {
 
 //  Función para reiniciar el temporizador cuando el usuario interactúa
 function resetInactivityTimer() {
-    clearTimeout(inactivityTimer);
-    warningCount = 0; // Reiniciar contador de advertencias
-    startInactivityTimer();
+    if (!sessionClosed) { // Solo resetea si la sesión está activa
+        clearTimeout(inactivityTimer);
+        warningCount = 0;
+        startInactivityTimer();
+    }
 }
 
 //  Función para iniciar el temporizador de inactividad
 function startInactivityTimer() {
     inactivityTimer = setTimeout(() => {
         handleInactivity();
-    }, 60000); // 1 minuto sin actividad
+    }, 30000); // 30 segundos sin actividad
 }
 
 //  Función para manejar la inactividad en el frontend
@@ -153,8 +166,16 @@ function handleInactivity() {
     } else if (warningCount === 2) {
         agregarMensaje("bot", "🔴 Sesión cerrada por inactividad. Espero haberte ayudado.");
         closeChat(); // Cerrar el chat después de 3 advertencias
+        closeSession();
     }
 }
+
+function closeSession() {
+    sessionClosed = true;
+    document.getElementById("mensaje").disabled = true; //  Bloquear campo de entrada
+    document.getElementById("chatContainer").classList.add("hidden"); //  Cerrar chat
+}
+
 
 // 🔹 CARRUSEL AUTOMÁTICO
 let currentIndex = 0;
@@ -181,11 +202,6 @@ document.getElementById("menu-trigger").addEventListener("click", function(event
 document.querySelector(".menu-toggle").addEventListener("click", function() {
     document.querySelector("nav ul").classList.toggle("show");
 });
-
-//  Función para cerrar el chat después de la inactividad
-function closeChat() {
-    document.getElementById("chatContainer").classList.add("hidden");
-}
 
 //  Eventos para detectar actividad y reiniciar el temporizador
 document.addEventListener("mousemove", resetInactivityTimer);
