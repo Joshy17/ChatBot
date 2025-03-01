@@ -74,6 +74,12 @@ function toggleChat() {
 
 const BACKEND_URL = "/api/send-message"; // Usa ruta relativa en Vercel
 
+let sessionId = localStorage.getItem("chatbotSessionId");
+if (!sessionId) {
+    sessionId = self.crypto.randomUUID();  // Genera un UUID único
+    localStorage.setItem("chatbotSessionId", sessionId);  // Lo guarda para futuras solicitudes
+}
+
 async function enviarMensaje() {
     const userMessage = document.getElementById("mensaje").value;
     if (!userMessage.trim()) return;
@@ -85,7 +91,7 @@ async function enviarMensaje() {
         const response = await fetch(BACKEND_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: userMessage }),
+            body: JSON.stringify({ message: userMessage, sessionId }), // 🔹 Enviar sessionId
         });
 
         const data = await response.json();
@@ -95,6 +101,7 @@ async function enviarMensaje() {
         agregarMensaje("bot", "Error al conectar con el servidor.");
     }
 }
+
 
 function agregarMensaje(tipo, mensaje) {
     const chatBody = document.getElementById("chatBody");

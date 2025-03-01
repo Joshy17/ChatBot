@@ -43,8 +43,11 @@ async function sendMessageToDialogflowCX(text, sessionId) {
 
 // Ruta que recibe mensajes
 app.post("/api/send-message", async (req, res) => {
-    const { message } = req.body;
-    const sessionId = "123456";
+    const { message, sessionId } = req.body;
+
+    if (!sessionId) {
+        return res.status(400).json({ error: "Falta sessionId" });
+    }
 
     try {
         const response = await sendMessageToDialogflowCX(message, sessionId);
