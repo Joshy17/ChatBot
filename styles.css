@@ -262,26 +262,43 @@ ul li:hover > a {
 /* 🔹 PIE DEL CHAT */
 .chat-footer {
     display: flex;
+    align-items: center; /*  Alinea verticalmente los elementos */
     padding: 10px;
     border-top: 1px solid #ccc;
+    background: white;
 }
 
 .chat-footer input {
     flex: 1;
-    padding: 8px;
+    padding: 10px; /* 🔥 Aumenta padding para mejor apariencia */
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 20px; /* 🔥 Bordes más suaves */
     outline: none;
+    font-size: 14px; /* 🔥 Tamaño de texto más legible */
 }
 
 .chat-footer button {
     background: #007bff;
     color: white;
     border: none;
-    padding: 8px;
+    padding: 10px 12px;
     cursor: pointer;
-    border-radius: 5px;
-    margin-left: 5px;
+    border-radius: 50%; /* 🔥 Hace el botón redondo */
+    margin-left: 8px; /* 🔥 Separa el botón del input */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: background 0.3s;
+}
+
+.chat-footer button:hover {
+    background: #0056b3; /* 🔥 Cambio de color al pasar el mouse */
+}
+
+/* 🔹 ÍCONO DENTRO DEL BOTÓN */
+.chat-footer button i {
+    font-size: 18px;
 }
 
 /* 🔹 OCULTAR CHAT */
