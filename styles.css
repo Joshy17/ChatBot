@@ -199,15 +199,15 @@ ul li:hover > a {
     bottom: 80px;
     right: 20px;
     width: 320px;
-    height: 500px;
+    height: 500px; /* 🔥 Ajuste de altura */
     background: white;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* 🔥 Permite que el contenido se distribuya correctamente */
     overflow: hidden;
     transition: 0.3s ease-in-out;
-    z-index: 2000; /* 🔥 Asegura que el chat también esté visible */
+    z-index: 2000;
 }
 
 /* 🔹 CABECERA DEL CHAT */
@@ -233,7 +233,7 @@ ul li:hover > a {
 /* 🔹 CONTENIDO DEL CHAT */
 .chat-body {
     padding: 10px;
-    height: 250px;
+    flex-grow: 1; /* 🔥 Ocupa todo el espacio disponible */
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -262,7 +262,7 @@ ul li:hover > a {
 /* 🔹 PIE DEL CHAT */
 .chat-footer {
     display: flex;
-    align-items: center; /*  Alinea verticalmente los elementos */
+    align-items: center;
     padding: 10px;
     border-top: 1px solid #ccc;
     background: white;
